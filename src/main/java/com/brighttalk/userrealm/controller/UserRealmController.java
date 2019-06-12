@@ -8,21 +8,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 public class UserRealmController {
 
     @Autowired
     private UserRealmService userRealmService;
 
-    @PostMapping(value = "/realm/save", consumes = {MediaType.APPLICATION_XML_VALUE,
+    @PostMapping(value = "/service/user/realm", consumes = {MediaType.APPLICATION_XML_VALUE,
     MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_XML_VALUE,
             MediaType.APPLICATION_JSON_VALUE})
-    public RealmResponseInterface saveUserRealm(@RequestBody UserRealm userRealm) {
-        return userRealmService.saveUserRealm(userRealm);
+    public RealmResponseInterface saveUserRealm(@RequestBody UserRealm userRealm, HttpServletResponse response) {
+        RealmResponseInterface result = userRealmService.saveUserRealm(userRealm);
+
+        if(result instanceof RealmError) {
+            response.setStatus(((RealmError)result).getHttpErrorStatusCode());
+        } else if (result instanceof UserRealm) {
+            response.setStatus(HttpServletResponse.SC_CREATED);
+        }
+
+        return result;
     }
 
-    @GetMapping(value = "/getrealm", produces = {MediaType.APPLICATION_XML_VALUE,MediaType.APPLICATION_JSON_VALUE})
-    public RealmResponseInterface getUserRealmById(@RequestParam String id) {
-        return userRealmService.getUserRealmById(id);
+    @GetMapping(value ="/service/user/realm/{id}", produces = {MediaType.APPLICATION_XML_VALUE,MediaType.APPLICATION_JSON_VALUE})
+    public RealmResponseInterface getUserRealmById(@PathVariable(name = "id") String id, HttpServletResponse response) {
+        RealmResponseInterface result = userRealmService.getUserRealmById(id);
+
+        if(result instanceof RealmError) {
+            response.setStatus(((RealmError)result).getHttpErrorStatusCode());
+        }
+
+        return result;
     }
 }

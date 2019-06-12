@@ -8,9 +8,9 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class UserRealmService {
     public RealmResponseInterface saveUserRealm(UserRealm userRealm) {
 
         if(Objects.equals(userRealm.getRealmName(), "") || userRealm.getRealmName() == null) {
-            return new RealmError("InvalidRealmName");
+            return new RealmError("InvalidRealmName",HttpServletResponse.SC_BAD_REQUEST);
         }
 
         UserRealm lastInsertedRealm;
@@ -33,10 +33,10 @@ public class UserRealmService {
             lastInsertedRealm = userRealmRepository.save(userRealm);
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
-            return new RealmError("DuplicatedRealmName");
+            return new RealmError("DuplicatedRealmName", HttpServletResponse.SC_BAD_REQUEST);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            return new RealmError("WrongEncryptionKeyGeneration");
+            return new RealmError("WrongEncryptionKeyGeneration", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         return lastInsertedRealm;
     }
@@ -50,10 +50,10 @@ public class UserRealmService {
         } catch (NoSuchElementException e) {
             //using the exception instead of null check by finding element by id
             e.printStackTrace();
-            return new RealmError("RealmNotFound");
+            return new RealmError("RealmNotFound",HttpServletResponse.SC_NOT_FOUND);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            return new RealmError("InvalidArgument");
+            return new RealmError("InvalidArgument",HttpServletResponse.SC_BAD_REQUEST);
         }
         return resultUserRealm;
     }

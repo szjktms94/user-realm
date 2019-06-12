@@ -15,8 +15,10 @@ public class UserRealm implements RealmResponseInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JacksonXmlProperty(isAttribute = true)
+    @JsonProperty("id")
     private int id;
 
+    @JacksonXmlProperty(localName = "name",isAttribute = true)
     @JsonProperty("name")
     private String realmName;
 
