@@ -44,8 +44,6 @@ public class UserRealmService {
     public RealmResponseInterface  getUserRealmById(String id) {
         UserRealm resultUserRealm;
         try {
-            //parse string instead of receiving direct int request param to be able
-            // to handle the exception and create the error object
             resultUserRealm = userRealmRepository.findById(Integer.parseInt(id)).get();
         } catch (NoSuchElementException e) {
             //using the exception instead of null check by finding element by id
@@ -58,6 +56,7 @@ public class UserRealmService {
         return resultUserRealm;
     }
 
+    //stubbed key generation
     private String generate32EncryptionKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(192);
